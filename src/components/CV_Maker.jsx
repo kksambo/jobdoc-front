@@ -75,17 +75,15 @@ const CV_Maker = () => {
   const [autoSaveStatus, setAutoSaveStatus] = useState("");
 
   useEffect(() => {
-    // Fetch available templates from FastAPI
     const fetchTemplates = async () => {
       try {
         const res = await fetch(
           "https://jobdoc-generator.onrender.com/api/cv/templates"
         );
-        if (!res.ok) throw new Error("Failed to fetch templates");
         const data = await res.json();
         setTemplatesList(data.templates || []);
-        if (data.templates && data.templates.length > 0) {
-          setTemplate(data.templates[0]); // default to first template
+        if (data.templates?.length) {
+          setTemplate(data.templates[0]);
         }
       } catch (err) {
         console.error(err);
@@ -120,9 +118,9 @@ const CV_Maker = () => {
   };
 
   const getSectionProgress = (fields, data) => {
-    const filled = fields.filter((field) => {
-      const value = data[field];
-      return Array.isArray(value) ? value.length > 0 : Boolean(value);
+    const filled = fields.filter((f) => {
+      const v = data[f];
+      return Array.isArray(v) ? v.length > 0 : Boolean(v);
     }).length;
     return Math.round((filled / fields.length) * 100);
   };
@@ -151,16 +149,8 @@ const CV_Maker = () => {
     }
   };
 
-  // Generate Preview
   const handleGeneratePreview = async () => {
-    if (!template) {
-      setSnackbar({
-        open: true,
-        message: "Please select a template first",
-        severity: "warning",
-      });
-      return;
-    }
+    if (!template) return;
 
     try {
       setLoading(true);
@@ -173,32 +163,17 @@ const CV_Maker = () => {
         }
       );
 
-      if (!res.ok) throw new Error("Failed to generate preview");
-
       const html = await res.text();
       setPreviewHtml(html);
       setActiveStep(4);
-      setSnackbar({
-        open: true,
-        message: "Preview Generated",
-        severity: "success",
-      });
     } catch (err) {
       console.error(err);
-      setSnackbar({
-        open: true,
-        message: "Failed to generate preview",
-        severity: "error",
-      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Download PDF
   const handleDownloadPDF = async () => {
-    if (!template) return;
-
     try {
       setLoading(true);
       const res = await fetch(
@@ -209,43 +184,27 @@ const CV_Maker = () => {
           body: JSON.stringify({ template, cv: cvData }),
         }
       );
-
-      if (!res.ok) throw new Error("Failed to download PDF");
-
       const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "My_CV.pdf");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      setSnackbar({
-        open: true,
-        message: "PDF Downloaded",
-        severity: "success",
-      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "My_CV.pdf";
+      a.click();
     } catch (err) {
       console.error(err);
-      setSnackbar({
-        open: true,
-        message: "Failed to download PDF",
-        severity: "error",
-      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 6 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 3, sm: 6 } }}>
       <Paper
         elevation={6}
         sx={{
-          p: { xs: 3, md: 5 },
+          p: { xs: 2, sm: 3, md: 5 },
           borderRadius: 4,
-          background: "linear-gradient(#ffffff, #fafafa)",
+          background: "linear-gradient(#fff, #fafafa)",
         }}
       >
         {/* Header */}
@@ -254,18 +213,22 @@ const CV_Maker = () => {
             icon={<AutoAwesome />}
             label="Smart CV Builder"
             color="primary"
-            sx={{ mb: 1 }}
           />
-          <Typography variant="h3" fontWeight={700}>
+          <Typography
+            fontWeight={700}
+            sx={{
+              mt: 1,
+              fontSize: { xs: "1.8rem", sm: "2.4rem", md: "3rem" },
+            }}
+          >
             Professional CV Maker
           </Typography>
           <Typography color="text.secondary" sx={{ mt: 1 }}>
             Build a job-ready CV with clean design and perfect structure
           </Typography>
 
-          {/* Template Selector */}
           <Box mt={3}>
-            <FormControl sx={{ minWidth: 200 }}>
+            <FormControl fullWidth>
               <InputLabel>Choose Template</InputLabel>
               <Select
                 value={template}
@@ -282,20 +245,17 @@ const CV_Maker = () => {
           </Box>
         </Box>
 
-        {/* Stepper */}
+        {/* Desktop Stepper */}
         <Stepper
           activeStep={activeStep}
           alternativeLabel
-          sx={{ mb: 6, "& .MuiStepLabel-label": { fontWeight: 500 } }}
+          sx={{ mb: 4, display: { xs: "none", sm: "flex" } }}
         >
-          {steps.map((label, index) => (
+          {steps.map((label, i) => (
             <Step key={label}>
               <StepLabel
-                onClick={() => setActiveStep(index)}
-                sx={{
-                  cursor: "pointer", // show pointer on hover
-                  "& .MuiStepLabel-label": { fontWeight: 500 },
-                }}
+                onClick={() => setActiveStep(i)}
+                sx={{ cursor: "pointer" }}
               >
                 {label}
               </StepLabel>
@@ -303,78 +263,37 @@ const CV_Maker = () => {
           ))}
         </Stepper>
 
-        {/* Section Progress */}
-        <Card sx={{ mb: 6, borderRadius: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Section Completion
-            </Typography>
-            <Grid container spacing={3}>
-              {[
-                { key: "personal", label: "Personal Info" },
-                { key: "experience", label: "Experience" },
-                { key: "education", label: "Education" },
-                { key: "skills", label: "Skills" },
-              ].map((section) => {
-                const progress = getSectionProgress(
-                  sectionConfig[section.key],
-                  cvData
-                );
-                return (
-                  <Grid item xs={12} sm={6} key={section.key}>
-                    <Box>
-                      <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        mb={0.5}
-                      >
-                        <Typography fontWeight={600}>
-                          {section.label}
-                        </Typography>
-                        <Chip
-                          size="small"
-                          color={progress === 100 ? "success" : "default"}
-                          label={
-                            progress === 100 ? "Completed" : `${progress}%`
-                          }
-                        />
-                      </Box>
-                      <LinearProgress
-                        variant="determinate"
-                        value={progress}
-                        sx={{
-                          height: 10,
-                          borderRadius: 5,
-                          bgcolor: "grey.200",
-                          "& .MuiLinearProgress-bar": { borderRadius: 5 },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-                );
-              })}
-            </Grid>
+        {/* Mobile Step Indicator */}
+        <Box
+          sx={{
+            display: { xs: "flex", sm: "none" },
+            justifyContent: "center",
+            mb: 3,
+          }}
+        >
+          <Chip
+            label={`Step ${activeStep + 1} of ${steps.length}: ${
+              steps[activeStep]
+            }`}
+            color="primary"
+            variant="outlined"
+          />
+        </Box>
 
-            {/* Overall Progress */}
-            <Box mt={4}>
-              <Typography fontWeight={600} mb={1}>
-                Overall CV Completion
-              </Typography>
-              <LinearProgress
-                variant="determinate"
-                value={overallProgress}
-                sx={{
-                  height: 14,
-                  borderRadius: 7,
-                  bgcolor: "grey.200",
-                  "& .MuiLinearProgress-bar": { borderRadius: 7 },
-                }}
-              />
-              <Typography variant="body2" color="text.secondary" mt={1}>
-                {overallProgress}% complete
-              </Typography>
-            </Box>
+        {/* Progress */}
+        <Card sx={{ mb: 4 }}>
+          <CardContent>
+            <Typography fontWeight={600} mb={1}>
+              Overall Completion
+            </Typography>
+            <LinearProgress
+              value={overallProgress}
+              variant="determinate"
+              sx={{ height: 10, borderRadius: 5 }}
+            />
+            <Typography variant="caption">
+              {overallProgress}% complete
+            </Typography>
           </CardContent>
         </Card>
 
@@ -388,28 +307,37 @@ const CV_Maker = () => {
           </Fade>
         )}
 
-        {/* Content */}
+        {/* Form Content */}
         <Box mb={5}>{getStepContent(activeStep)}</Box>
 
         {/* Actions */}
-        <Box display="flex" justifyContent="space-between">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 2,
+            position: { xs: "sticky", sm: "static" },
+            bottom: 0,
+            backgroundColor: "background.paper",
+            py: 2,
+          }}
+        >
           <Button
+            variant="outlined"
             disabled={activeStep === 0}
             onClick={handleBack}
-            variant="outlined"
-            sx={{ borderRadius: 3 }}
+            fullWidth
           >
             Back
           </Button>
 
           {activeStep === steps.length - 1 ? (
-            <Box>
+            <>
               <Button
                 variant="contained"
                 startIcon={<Preview />}
                 onClick={handleGeneratePreview}
-                sx={{ mr: 2, borderRadius: 3 }}
-                disabled={loading}
+                fullWidth
               >
                 Preview
               </Button>
@@ -418,18 +346,17 @@ const CV_Maker = () => {
                 color="success"
                 startIcon={<Download />}
                 onClick={handleDownloadPDF}
-                sx={{ borderRadius: 3 }}
-                disabled={loading || !previewHtml}
+                fullWidth
               >
                 Download PDF
               </Button>
-            </Box>
+            </>
           ) : (
             <Button
               variant="contained"
               endIcon={<Save />}
               onClick={handleNext}
-              sx={{ borderRadius: 3 }}
+              fullWidth
             >
               Save & Continue
             </Button>
@@ -437,12 +364,10 @@ const CV_Maker = () => {
         </Box>
       </Paper>
 
-      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={5000}
+        autoHideDuration={4000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
       </Snackbar>
