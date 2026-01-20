@@ -1,47 +1,20 @@
-// App.js
-import React from 'react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import CV_Maker from './components/CV_Maker';
+import React from "react";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Layout from "./components/Layout";
+import Home from "./components/Home";
+import CV_Maker from "./components/CV_Maker";
+import CoverLetterMaker from "./components/CoverLetterMaker";
+import Register from "./components/Register";
+import Login from "./components/Login";
+import SupportingDocumentsPage from "./components/Documents";
 
 const theme = createTheme({
   palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-    background: {
-      default: '#f5f5f5',
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h4: {
-      fontWeight: 600,
-    },
-  },
-  shape: {
-    borderRadius: 8,
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          fontWeight: 500,
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundImage: 'none',
-        },
-      },
-    },
+    primary: { main: "#1976d2" },
+    background: { default: "#f5f5f5" },
   },
 });
 
@@ -49,9 +22,17 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-        <CV_Maker />
-      </Box>
+      <Router>
+        <Routes>
+          <Route path="/home" element={<Home />} />
+          <Route path="/cv-builder" element={<CV_Maker />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<Login />} />
+          <Route path="/documents" element={<SupportingDocumentsPage />} />
+          {/* Future */}
+          <Route path="/cover-letters" element={<CoverLetterMaker />} />
+        </Routes>
+      </Router>
     </ThemeProvider>
   );
 }
