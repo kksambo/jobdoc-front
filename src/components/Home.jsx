@@ -63,12 +63,29 @@ const Home = () => {
       desc: "Create tailored cover letters",
       link: "/cover-letters",
     },
-
+    {
+      icon: "🤖",
+      title: "ATS Templates",
+      desc: "Optimized for ATS systems",
+      link: "/cv-builder/templates",
+    },
     {
       icon: "📂",
       title: "Document Storage",
       desc: "Organize all job documents",
       link: "/documents",
+    },
+    {
+      icon: "📊",
+      title: "Application Tracker",
+      desc: "Track applications easily",
+      link: "/applications",
+    },
+    {
+      icon: "🌍",
+      title: "Global Jobs",
+      desc: "Apply anywhere in the world",
+      link: "/jobs",
     },
   ];
 
@@ -77,7 +94,7 @@ const Home = () => {
     { text: "CVs", link: "/cv-builder" },
     { text: "Letters", link: "/cover-letters" },
     { text: "Docs", link: "/documents" },
-    s,
+    { text: "Track", link: "/applications" },
   ];
 
   useEffect(() => {
