@@ -23,6 +23,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
+      // 1️⃣ Login request
       const res = await fetch("https://jobdoc-generator.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -31,12 +32,31 @@ const Login = () => {
 
       const result = await res.json();
 
-      if (res.ok) {
-        localStorage.setItem("token", result.access_token);
-        navigate("/home");
-      } else {
+      if (!res.ok) {
         alert(result.detail || "Invalid credentials");
+        return;
       }
+
+      // 2️⃣ Save token
+      localStorage.setItem("token", result.access_token);
+
+      // 3️⃣ Fetch user info
+      const meRes = await fetch("https://jobdoc-generator.onrender.com/me", {
+        headers: {
+          Authorization: `Bearer ${result.access_token}`,
+        },
+      });
+
+      const meData = await meRes.json();
+
+      if (meRes.ok) {
+        // Save personal info to localStorage
+        localStorage.setItem("personalInfo", JSON.stringify(meData));
+      } else {
+        console.error("Failed to fetch user info", meData);
+      }
+
+      navigate("/home");
     } catch (err) {
       console.error(err);
       alert("Server error");
@@ -96,7 +116,6 @@ const Login = () => {
 
         <Divider sx={{ my: 3 }}>OR</Divider>
 
-        {/* ✅ Register Button */}
         <Button
           variant="outlined"
           fullWidth
