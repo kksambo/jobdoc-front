@@ -70,12 +70,26 @@ const Home = () => {
       desc: "Organize all job documents",
       link: "/documents",
     },
+    {
+      icon: "📂",
+      title: "Job Search",
+      desc: "search for jobs ",
+      link: "/job-search",
+    },
+    {
+      icon: "📂",
+      title: "Track Application",
+      desc: "Keep your applications on track",
+      link: "/track",
+    },
   ];
 
   const menuItems = [
     { text: "CVs", link: "/cv-builder" },
     { text: "Letters", link: "/cover-letters" },
     { text: "Docs", link: "/documents" },
+    { text: "Job Serch", link: "/job-search" },
+    { text: "Tracking", link: "/track" },
     { text: "Logout", link: "/" },
   ];
 

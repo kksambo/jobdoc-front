@@ -10,6 +10,8 @@ import CoverLetterMaker from "./components/CoverLetterMaker";
 import Register from "./components/Register";
 import Login from "./components/Login";
 import SupportingDocumentsPage from "./components/Documents";
+import JobSearch from "./components/JobSearch";
+import JobTracker from "./components/Tracking";
 
 const theme = createTheme({
   palette: {
@@ -31,6 +33,8 @@ function App() {
           <Route path="/documents" element={<SupportingDocumentsPage />} />
           {/* Future */}
           <Route path="/cover-letters" element={<CoverLetterMaker />} />
+          <Route path="/job-search" element={<JobSearch />} />
+          <Route path="/track" element={<JobTracker />} />
         </Routes>
       </Router>
     </ThemeProvider>
