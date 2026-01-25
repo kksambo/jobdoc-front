@@ -90,7 +90,6 @@ const Home = () => {
     { text: "Docs", link: "/documents" },
     { text: "Job Serch", link: "/job-search" },
     { text: "Tracking", link: "/track" },
-    { text: "Logout", link: "/" },
   ];
 
   useEffect(() => {
