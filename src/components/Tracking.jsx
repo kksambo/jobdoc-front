@@ -51,7 +51,7 @@ export default function JobTracker() {
     const fetchJobs = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/api/jobs?username=${username}`,
+          `https://jobdoc-generator.onrender.com/api/jobs?username=${username}`,
         );
         if (!res.ok) throw new Error("Failed to fetch jobs");
         const data = await res.json();
@@ -78,7 +78,7 @@ export default function JobTracker() {
   const updateStatus = async (jobId, status) => {
     try {
       const res = await fetch(
-        `http://localhost:8000/api/jobs/tracked/${jobId}?status=${encodeURIComponent(
+        `https://jobdoc-generator.onrender.com/api/jobs/tracked/${jobId}?status=${encodeURIComponent(
           status,
         )}`,
         { method: "PATCH" },

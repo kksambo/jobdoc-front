@@ -43,7 +43,7 @@ const JobSearch = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:8000/api/jobs/search?title=${encodeURIComponent(
+        `https://jobdoc-generator.onrender.com/api/jobs/search?title=${encodeURIComponent(
           title,
         )}&location=${encodeURIComponent(location)}`,
       );
@@ -104,7 +104,7 @@ const JobSearch = () => {
     };
 
     try {
-      await fetch("http://localhost:8000/api/jobs/track", {
+      await fetch("https://jobdoc-generator.onrender.com/api/jobs/track", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
